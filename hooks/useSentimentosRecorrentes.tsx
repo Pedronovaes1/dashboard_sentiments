@@ -1,5 +1,3 @@
-import { error } from "console";
-import { setDate } from "date-fns";
 import { useEffect, useState } from "react";
 
 export function useSentimentosRecorrentes() {
@@ -9,7 +7,7 @@ export function useSentimentosRecorrentes() {
     useEffect(() => {
       const fetchDados = async () => {
         try {
-          const res = await fetch('http://localhost:8000/sentimento/recorrente');
+          const res = await fetch(process.env.NEXT_PUBLIC_API_URL+'/sentimento/recorrente');
           const json = await res.json();
           setDados(json);
           setLoading(false);

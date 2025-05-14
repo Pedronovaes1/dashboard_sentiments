@@ -55,10 +55,6 @@ export function DashboardPage() {
             ITP Dashboard
           </div>
           <div className="ml-auto flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="Buscar..." className="w-[200px] pl-8 md:w-[300px] lg:w-[320px]" />
-            </div>
             <Button variant="outline" size="icon" onClick={handleRefresh}>
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
               <span className="sr-only">Atualizar dados</span>
@@ -83,8 +79,7 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
-      <div className="grid flex-1 md:grid-cols-[220px_1fr]">
-        <DashboardNav />
+      <div className="flex-1 md:grid-cols-[220px_1fr]">
         <div className="flex-1 p-4 md:p-6 space-y-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>

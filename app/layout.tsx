@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export const metadata: Metadata = {
   title: 'ITP dashboard',
