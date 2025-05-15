@@ -8,17 +8,6 @@ export function SentimentDistribution() {
   const [data, setData] = useState([])
   const { dados, loading } = useSentimentosRecorrentes()
 
-  // useEffect(() => {
-  //   setData([
-  //     { name: "Satisfação", value: 40, color: "#10b981" },
-  //     { name: "Frustração", value: 18, color: "#f97316" },
-  //     { name: "Confusão", value: 12, color: "#eab308" },
-  //     { name: "Urgência", value: 10, color: "#3b82f6" },
-  //     { name: "Raiva", value: 8, color: "#ef4444" },
-  //     { name: "Neutro", value: 12, color: "#6b7280" },
-  //   ])
-  // }, [])
-
   const processData = (apiResponse) => {
       const colorMap = {
           Satisfação: "#10b981",
@@ -41,7 +30,6 @@ export function SentimentDistribution() {
   }
 
   useEffect(() => {
-      console.log('API Response from useSentimentosRecorrentes:', dados)
       setData(processData(dados))
   }, [dados])
 

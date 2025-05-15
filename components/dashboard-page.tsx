@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Calendar,
   ChevronDown,
@@ -8,16 +8,12 @@ import {
   Filter,
   MessageSquare,
   RefreshCw,
-  Search,
   ThumbsDown,
   ThumbsUp,
   TrendingDown,
-  TrendingUp,
-  Users,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -29,21 +25,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Progress } from "@/components/ui/progress"
-import { DashboardNav } from "@/components/dashboard-nav"
 import { SentimentChart } from "@/components/sentiment-chart"
 import { SentimentDistribution } from "@/components/sentiment-distribution"
 import { RecentComments } from "@/components/recent-comments"
 import { TopicAnalysis } from "@/components/topic-analysis"
-import { useSentimentosRecorrentes } from "../hooks/useSentimentosRecorrentes"
+import { useSentimentosFrequentes } from "@/hooks/useSentimentoFrequente"
 
 
 
 export function DashboardPage() {
+  const [data, setData] = useState([])
+  const { dados, loading } = useSentimentosFrequentes()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const handleRefresh = () => {
     setIsRefreshing(true)
     setTimeout(() => setIsRefreshing(false), 1500)
   }
+
+
+  useEffect(() => {
+      setData([dados])
+  }, [dados])
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -129,19 +131,25 @@ export function DashboardPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Sentimento Predominante</CardTitle>
-                <ThumbsUp className="h-4 w-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">Satisfação</div>
-                <p className="text-xs text-muted-foreground">40% das menções</p>
-                <div className="mt-3">
-                  <Progress value={40} className="h-2 bg-gray-200" />
-                </div>
-              </CardContent>
-            </Card>
+            {data && data.map((e) => (
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Sentimento Predominante</CardTitle>
+                  {data.classe != "negativo" ? (
+                    <ThumbsUp className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <ThumbsDown className="h-4 w-4 text-red-500" />
+                  )}
+                </CardHeader>
+                  <CardContent>
+                     <div className="text-2xl font-bold">{e.sentimento_predominante}</div>
+                     <p className="text-xs text-muted-foreground">{e.porcentagem}% das menções</p>
+                     <div className="mt-3">
+                       <Progress value={e.porcentagem} className="h-2 bg-gray-200" />
+                     </div>
+                  </CardContent>
+              </Card>
+            ))}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Sentimentos Negativos</CardTitle>
