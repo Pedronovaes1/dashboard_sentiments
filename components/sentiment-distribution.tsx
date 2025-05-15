@@ -1,24 +1,49 @@
 "use client"
 
+import { useSentimentosRecorrentes } from "@/hooks/useSentimentosRecorrentes"
 import { useEffect, useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 
-const COLORS = ["#10b981", "#f59e0b", "#ef4444"]
-
 export function SentimentDistribution() {
   const [data, setData] = useState([])
+  const { dados, loading } = useSentimentosRecorrentes()
+
+  // useEffect(() => {
+  //   setData([
+  //     { name: "Satisfação", value: 40, color: "#10b981" },
+  //     { name: "Frustração", value: 18, color: "#f97316" },
+  //     { name: "Confusão", value: 12, color: "#eab308" },
+  //     { name: "Urgência", value: 10, color: "#3b82f6" },
+  //     { name: "Raiva", value: 8, color: "#ef4444" },
+  //     { name: "Neutro", value: 12, color: "#6b7280" },
+  //   ])
+  // }, [])
+
+  const processData = (apiResponse) => {
+      const colorMap = {
+          Satisfação: "#10b981",
+          Frustração: "#f97316",
+          Confusão: "#eab308",
+          Urgência: "#3b82f6",
+          Raiva: "#ef4444",
+          Neutro: "#6b7280"
+      }
+
+      if (!apiResponse || !Array.isArray(apiResponse.sentimento)) return []
+
+          return apiResponse.sentimento.map((item) => {
+              const name = item.sentimento
+              const value = item.count
+              const color = colorMap[name] || "#cccccc"
+
+              return { name, value, color }
+          })
+  }
 
   useEffect(() => {
-    // Dados simulados para o gráfico de pizza com os sentimentos específicos
-    setData([
-      { name: "Satisfação", value: 40, color: "#10b981" },
-      { name: "Frustração", value: 18, color: "#f97316" },
-      { name: "Confusão", value: 12, color: "#eab308" },
-      { name: "Urgência", value: 10, color: "#3b82f6" },
-      { name: "Raiva", value: 8, color: "#ef4444" },
-      { name: "Neutro", value: 12, color: "#6b7280" },
-    ])
-  }, [])
+      console.log('API Response from useSentimentosRecorrentes:', dados)
+      setData(processData(dados))
+  }, [dados])
 
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5

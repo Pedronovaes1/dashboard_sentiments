@@ -40,7 +40,6 @@ import { useSentimentosRecorrentes } from "../hooks/useSentimentosRecorrentes"
 
 export function DashboardPage() {
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const { dados, loading } = useSentimentosRecorrentes()
   const handleRefresh = () => {
     setIsRefreshing(true)
     setTimeout(() => setIsRefreshing(false), 1500)
