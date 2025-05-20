@@ -15,13 +15,13 @@ export function useSentimentosFrequentes() {
 
                 const sentimento = json.sentimento_predominante.toLowerCase();
 
-                const classificacao = sentimentoPositivo.includes(sentimento)
+                const classe = sentimentoPositivo.includes(sentimento)
                     ? "Positivo"
                     : sentimentoNegativo.includes(sentimento)
                     ? "Negativo"
                     : "Neutro";
 
-                setDados({ ...json, classificacao });
+                setDados({ ...json, classe });
                 setLoading(false);
             } catch (error) {
                 console.error('Erro ao buscar sentimentos:', error);
