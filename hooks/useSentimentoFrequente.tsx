@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const sentimentoPositivo = ["satisfação"];
-const sentimentoNegativo = ["raiva", "frustração", "confusão", "urgencia"];
+const sentimentoNegativo = ["raiva", "frustração", "confusão", "urgência"];
 
 export function useSentimentosFrequentes() {
     const [dados, setDados] = useState([]);
