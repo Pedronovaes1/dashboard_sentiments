@@ -30,12 +30,17 @@ import { SentimentDistribution } from "@/components/sentiment-distribution"
 import { RecentComments } from "@/components/recent-comments"
 import { TopicAnalysis } from "@/components/topic-analysis"
 import { useSentimentosFrequentes } from "@/hooks/useSentimentoFrequente"
+import { useSentimentosRecorrentes } from "@/hooks/useSentimentosRecorrentes"
 
 
 
 export function DashboardPage() {
-  const [data, setData] = useState([])
-  const { dados, loading } = useSentimentosFrequentes()
+  const [ frequenteData, setFrequenteData ] = useState([])
+  const [ recorrenteData, setRecorrenteData ] = useState([])
+
+  const { dados: frequente, loading: loadingFrequente } = useSentimentosFrequentes()
+  const { dados: recorrente, loading: loadingRecorrente } = useSentimentosRecorrentes()
+
   const [isRefreshing, setIsRefreshing] = useState(false)
   const handleRefresh = () => {
     setIsRefreshing(true)
@@ -44,8 +49,10 @@ export function DashboardPage() {
 
 
   useEffect(() => {
-      setData([dados])
-  }, [dados])
+      setFrequenteData([frequente])
+      setRecorrenteData(recorrente)
+      console.log(recorrenteData)
+  }, [frequente, recorrente])
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -131,7 +138,7 @@ export function DashboardPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-            {data && data.map((e) => (
+            {frequenteData && frequenteData.map((e: any) => (
               <Card key={e.sentimento_predominante}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Sentimento Predominante</CardTitle>

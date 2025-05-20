@@ -18,9 +18,9 @@ export function SentimentDistribution() {
           Neutro: "#6b7280"
       }
 
-      if (!apiResponse || !Array.isArray(apiResponse.sentimento)) return []
+      if (!apiResponse || !Array.isArray(apiResponse)) return []
 
-          return apiResponse.sentimento.map((item) => {
+          return apiResponse.map((item) => {
               const name = item.sentimento
               const value = item.count
               const color = colorMap[name] || "#cccccc"
