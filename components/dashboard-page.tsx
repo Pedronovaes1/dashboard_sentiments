@@ -132,7 +132,7 @@ export function DashboardPage() {
 
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
             {data && data.map((e) => (
-              <Card>
+              <Card key={e.sentimento_predominante}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Sentimento Predominante</CardTitle>
                   {e.classe != "Negativo" ? (
