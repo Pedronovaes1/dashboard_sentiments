@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import {
-  Calendar,
   ChevronDown,
   Download,
   Filter,
@@ -51,8 +50,7 @@ export function DashboardPage() {
   useEffect(() => {
       setFrequenteData([frequente])
       setRecorrenteData(recorrente)
-      console.log(recorrenteData)
-  }, [frequente, recorrente])
+  }, [frequente, recorrente, isRefreshing])
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -95,25 +93,6 @@ export function DashboardPage() {
               <p className="text-muted-foreground">Análise de sentimentos dos clientes e funcinários</p>
             </div>
             <div className="flex items-center gap-2 self-start md:self-auto">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>Últimos 30 dias</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Hoje</DropdownMenuItem>
-                  <DropdownMenuItem>Últimos 7 dias</DropdownMenuItem>
-                  <DropdownMenuItem>Últimos 30 dias</DropdownMenuItem>
-                  <DropdownMenuItem>Este mês</DropdownMenuItem>
-                  <DropdownMenuItem>Este trimestre</DropdownMenuItem>
-                  <DropdownMenuItem>Este ano</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Personalizado</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon">

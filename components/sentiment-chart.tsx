@@ -1,7 +1,9 @@
 "use client"
 
+import { useSentimentoAll } from "@/hooks/useSentimentoAll"
 import { useEffect, useState } from "react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { DateTime } from "luxon"
 
 // Dados simulados para o gráfico
 const generateData = () => {
@@ -34,12 +36,55 @@ const generateData = () => {
   return data
 }
 
+const treatData = (raw) => {
+
+    const grouped = new Map();
+    raw.forEach((entry) => {
+        const dt = DateTime.fromISO(entry.data_analise, { setZone: true });
+        if (!dt.isValid) return;
+        const key = dt.toFormat("yyyy-MM-dd"); // for daily aggregation
+        if (!grouped.has(key)) {
+            grouped.set(key, {
+                date: key,
+                satisfacao: 0,
+                frustracao: 0,
+                confusao: 0,
+                urgencia: 0,
+                raiva: 0,
+                neutro: 0,
+            });
+        }
+        const bucket = grouped.get(key);
+        const sentiment = entry.sentimento?.toLowerCase();
+        if (bucket.hasOwnProperty(sentiment)) {
+            bucket[sentiment]++;
+        }
+    });
+    
+    console.log(grouped);
+    
+    return Array.from(grouped.values())
+        .sort((a, b) => {
+            return DateTime.fromFormat(a.date, "yyyy-MM-dd") - DateTime.fromFormat(b.date, "yyyy-MM-dd");
+        })
+        .map(item => ({
+            ...item,
+            // Convert date from "yyyy-MM-dd" to "DD/MM" format to match generateData()
+            date: DateTime.fromFormat(item.date, "yyyy-MM-dd").toFormat("dd/MM")
+        }));
+};
+
+
 export function SentimentChart() {
   const [data, setData] = useState([])
+  const { dados: sentimentoAllData, loading: loadingAll } = useSentimentoAll()
 
   useEffect(() => {
-    setData(generateData())
-  }, [])
+    if(sentimentoAllData){
+        setData(treatData(sentimentoAllData))
+        
+    }
+  }, [sentimentoAllData])
 
   return (
     <div className="h-[300px] w-full">

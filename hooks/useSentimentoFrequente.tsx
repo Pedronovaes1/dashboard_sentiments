@@ -34,15 +34,15 @@ export function useSentimentosFrequentes() {
                 const classe = sentimentoPositivo.includes(sentimento_normalizado)
                     ? "Positivo"
                     : sentimentoNegativo.includes(sentimento_normalizado)
-                        ? "Negativo"
-                        : "Neutro";
+                    ? "Negativo"
+                    : "Neutro";
 
-                        const sentimento_formatado =
-                            sentimentosMap[sentimento_normalizado] ??
-                            json.sentimento_predominante;
+                const sentimento_formatado =
+                    sentimentosMap[sentimento_normalizado] ??
+                    json.sentimento_predominante;
 
-                        setDados({ ...json, sentimento_predominante: sentimento_formatado, classe });
-                        setLoading(false);
+                setDados({ ...json, sentimento_predominante: sentimento_formatado, classe });
+                setLoading(false);
             } catch (error) {
                 console.error('Erro ao buscar sentimentos:', error);
             }
