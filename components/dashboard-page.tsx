@@ -45,6 +45,7 @@ const treatFrequente = (data) => {
 };
 
 export function DashboardPage() {
+  const [ limit, setLimit ] = useState(4)
   const [ frequenteData, setFrequenteData ] = useState([])
   const [ recorrenteData, setRecorrenteData ] = useState([])
 
@@ -212,10 +213,10 @@ export function DashboardPage() {
                     </Select>
                   </CardHeader>
                   <CardContent>
-                    <RecentComments />
+                    <RecentComments limit={limit} />
                   </CardContent>
                   <CardFooter className="flex justify-center border-t px-6 py-4">
-                    <Button variant="outline">Ver Todos</Button>
+                    <Button variant="outline" onClick={() => setLimit(null)}>Ver Todos</Button>
                   </CardFooter>
                 </Card>
                 <Card className="lg:col-span-3">

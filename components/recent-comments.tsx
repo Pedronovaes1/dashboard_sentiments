@@ -4,6 +4,9 @@ import { ThumbsDown, ThumbsUp, Minus, HelpCircle, Clock, AlertTriangle } from "l
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { DateTime } from "luxon";
+import { useAtendimento } from "@/hooks/useAtendimento"
+import { useEffect, useState } from "react"
 
 interface Comment {
   id: number
@@ -18,66 +21,64 @@ interface Comment {
   date: string
 }
 
-const comments: Comment[] = [
-  {
-    id: 1,
-    user: {
-      name: "Carolina Silva",
-      initials: "CS",
-    },
-    source: "Twitter",
-    comment: "Adorei o novo aplicativo! A interface está muito mais intuitiva e rápida. Parabéns pelo trabalho!",
-    sentiment: "satisfacao",
-    date: "Hoje, 14:32",
-  },
-  {
-    id: 2,
-    user: {
-      name: "Rafael Mendes",
-      initials: "RM",
-    },
-    source: "Facebook",
-    comment:
-      "O atendimento ao cliente melhorou bastante nos últimos meses. Consegui resolver meu problema rapidamente.",
-    sentiment: "satisfacao",
-    date: "Hoje, 11:15",
-  },
-  {
-    id: 3,
-    user: {
-      name: "Mariana Costa",
-      initials: "MC",
-    },
-    source: "E-mail",
-    comment: "Estou aguardando resposta sobre meu pedido há 3 dias. Preciso de uma solução urgente.",
-    sentiment: "urgencia",
-    date: "Ontem, 16:45",
-  },
-  {
-    id: 4,
-    user: {
-      name: "Pedro Alves",
-      initials: "PA",
-    },
-    source: "Site",
-    comment: "O produto chegou no prazo previsto. Ainda não testei todas as funcionalidades.",
-    sentiment: "neutro",
-    date: "Ontem, 09:20",
-  },
-  {
-    id: 5,
-    user: {
-      name: "Juliana Ferreira",
-      initials: "JF",
-    },
-    source: "Instagram",
-    comment: "Comprei o produto há uma semana e já apresentou defeito. Muito decepcionada com a qualidade.",
-    sentiment: "raiva",
-    date: "22/05/2023",
-  },
-]
 
-export function RecentComments() {
+
+const treatData = (comments, limit = null) => {
+    let idCounter = 1;
+    const sorted = [...comments].sort((a, b) =>
+     DateTime.fromISO(b.data_acao).toMillis() - DateTime.fromISO(a.data_acao).toMillis()
+    );
+
+    const limited = limit ? sorted.slice(0, limit) : sorted;
+
+    return limited.map((input) => {
+        const { user, conversa, sentimento, data_acao } = input;
+
+        const name = user || "Usuário Anônimo";
+        const initials = name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase();
+
+        const dateTime = DateTime.fromISO(data_acao, { zone: "utc" }).setZone();
+        const now = DateTime.local();
+
+        let dateLabel = dateTime.toFormat("dd/MM/yyyy, HH:mm");
+        if (dateTime.hasSame(now, "day")) {
+            dateLabel = `Hoje, ${dateTime.toFormat("HH:mm")}`;
+        } else if (dateTime.hasSame(now.minus({ days: 1 }), "day")) {
+            dateLabel = `Ontem, ${dateTime.toFormat("HH:mm")}`;
+        }
+
+        return {
+            id: idCounter++,
+            user: {
+                name,
+                initials,
+            },
+            source: "Chat Interno",
+            comment: conversa,
+            sentiment: sentimento,
+            date: dateLabel,
+        };
+    });
+};
+
+type RecentCommentsProps = {
+  limit?: number;
+};
+
+export function RecentComments({ limit }: RecentCommentsProps) {
+    const [ data, setData ] = useState([])
+    const { dados, loading } = useAtendimento()
+
+    useEffect(() => {
+        if(dados) {
+            setData(treatData(dados, limit))
+        }
+    }, [dados])
+
   const getSentimentIcon = (sentiment: string) => {
     switch (sentiment) {
       case "satisfacao":
@@ -114,13 +115,15 @@ export function RecentComments() {
 
   return (
     <div className="space-y-4">
-      {comments.map((comment, index) => (
+      {data && data.map((comment: Comment, index) => (
         <div key={comment.id}>
           <div className="flex items-start gap-4">
-            <Avatar className="h-10 w-10 border">
-              <AvatarImage src={comment.user.avatar || "/placeholder.svg"} alt={comment.user.name} />
-              <AvatarFallback>{comment.user.initials}</AvatarFallback>
-            </Avatar>
+          <Avatar className="h-10 w-10 border">
+              {comment.user.avatar ? (
+                  <AvatarImage src={comment.user.avatar} alt={comment.user.name} />
+              ) : null}
+                  <AvatarFallback>{comment.user.initials}</AvatarFallback>
+              </Avatar>
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between">
                 <div className="font-medium">{comment.user.name}</div>
@@ -134,7 +137,7 @@ export function RecentComments() {
               <div className="pt-1">{getSentimentBadge(comment.sentiment)}</div>
             </div>
           </div>
-          {index < comments.length - 1 && <Separator className="my-4" />}
+          {index < data.length - 1 && <Separator className="my-4" />}
         </div>
       ))}
     </div>
