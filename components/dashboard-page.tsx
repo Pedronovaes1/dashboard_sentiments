@@ -33,6 +33,17 @@ import { useSentimentosRecorrentes } from "@/hooks/useSentimentosRecorrentes"
 
 
 
+const treatFrequente = (data) => {
+    let id = 0;
+    return data.map((entry) => {
+        id += 1;
+        return {
+            ...entry,
+            id: id
+        };
+    });
+};
+
 export function DashboardPage() {
   const [ frequenteData, setFrequenteData ] = useState([])
   const [ recorrenteData, setRecorrenteData ] = useState([])
@@ -48,7 +59,7 @@ export function DashboardPage() {
 
 
   useEffect(() => {
-      setFrequenteData([frequente])
+      setFrequenteData(treatFrequente([frequente]))
       setRecorrenteData(recorrente)
   }, [frequente, recorrente, isRefreshing])
 
@@ -118,7 +129,7 @@ export function DashboardPage() {
 
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
             {frequenteData && frequenteData.map((e: any) => (
-              <Card key={e.sentimento_predominante}>
+              <Card key={e.id}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Sentimento Predominante</CardTitle>
                   {e.classe != "Negativo" ? (

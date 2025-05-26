@@ -61,8 +61,6 @@ const treatData = (raw) => {
         }
     });
     
-    console.log(grouped);
-    
     return Array.from(grouped.values())
         .sort((a, b) => {
             return DateTime.fromFormat(a.date, "yyyy-MM-dd") - DateTime.fromFormat(b.date, "yyyy-MM-dd");
