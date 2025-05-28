@@ -1,5 +1,7 @@
 "use client"
 
+import { normalizeWord } from "@/hooks/useSentimentoFrequente"
+import { useSentimentosRecorrentes } from "@/hooks/useSentimentosRecorrentes"
 import { useEffect, useState } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
@@ -10,23 +12,42 @@ interface TopicData {
   sentimentPercent: number
 }
 
-export function TopicAnalysis() {
-  const [data, setData] = useState<TopicData[]>([])
+const treatData = (raw): TopicData[] => {
+  const total = raw.reduce((sum, item) => sum + item.count, 0);
+
+  return raw.map(item => {
+    const sentiment = item.sentimento;
+    const count = item.count;
+    const sentimentPercent = total > 0 ? (count / total) * 100 : 0;
+
+    return {
+      name: sentiment.charAt(0).toUpperCase() + sentiment.slice(1),
+      count,
+      sentiment,
+      sentimentPercent: Number(sentimentPercent.toFixed(2)), // optional rounding
+    };
+  });
+};
+
+type TopicAnalysisProps = {
+    filter?: string
+};
+
+export function TopicAnalysis( { filter }: TopicAnalysisProps) {
+
+  const [ data, setData ] = useState<TopicData[]>([])
+  const { dados, loading } = useSentimentosRecorrentes()
+
 
   useEffect(() => {
     // Dados simulados para a análise de tópicos com sentimento predominante
-    setData([
-      { name: "Atendimento", count: 245, sentiment: "satisfacao", sentimentPercent: 68 },
-      { name: "Produto", count: 187, sentiment: "satisfacao", sentimentPercent: 72 },
-      { name: "Preço", count: 156, sentiment: "frustracao", sentimentPercent: 45 },
-      { name: "Entrega", count: 132, sentiment: "urgencia", sentimentPercent: 53 },
-      { name: "Qualidade", count: 98, sentiment: "satisfacao", sentimentPercent: 65 },
-      { name: "App", count: 76, sentiment: "confusao", sentimentPercent: 38 },
-    ])
-  }, [])
+    if(dados){
+        setData(treatData(dados))
+    }
+  }, [dados])
 
   const getBarColor = (sentiment: string) => {
-    switch (sentiment) {
+    switch (normalizeWord(sentiment)) {
       case "satisfacao":
         return "#10b981" // verde
       case "frustracao":
@@ -50,10 +71,7 @@ export function TopicAnalysis() {
             data={data}
             layout="vertical"
             margin={{
-              top: 5,
-              right: 30,
-              left: 80,
-              bottom: 5,
+              right: 60,
             }}
           >
             <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
@@ -74,16 +92,13 @@ export function TopicAnalysis() {
       </div>
 
       <div className="space-y-2">
-        {data.map((topic) => (
+        {data && data.map((topic) => (
           <div key={topic.name} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="h-3 w-3 rounded-full" style={{ backgroundColor: getBarColor(topic.sentiment) }} />
               <span className="text-sm font-medium">{topic.name}</span>
             </div>
             <div className="text-sm">
-              <span className="font-medium" style={{ color: getBarColor(topic.sentiment) }}>
-                {topic.sentiment.charAt(0).toUpperCase() + topic.sentiment.slice(1)}
-              </span>
               <span className="text-muted-foreground"> ({topic.sentimentPercent}%)</span>
             </div>
           </div>

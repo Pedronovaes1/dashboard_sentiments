@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import { DateTime } from "luxon";
 import { useAtendimento } from "@/hooks/useAtendimento"
 import { useEffect, useState } from "react"
+import { formatWord, normalizeWord } from "@/hooks/useSentimentoFrequente"
 
 interface Comment {
   id: number
@@ -23,23 +24,28 @@ interface Comment {
 
 
 
-const treatData = (comments, limit = null) => {
+const treatData = (comments, limit = null, filter = null) => {
     let idCounter = 1;
+
     const sorted = [...comments].sort((a, b) =>
-     DateTime.fromISO(b.data_acao).toMillis() - DateTime.fromISO(a.data_acao).toMillis()
+        DateTime.fromISO(b.data_acao).toMillis() - DateTime.fromISO(a.data_acao).toMillis()
     );
 
-    const limited = limit ? sorted.slice(0, limit) : sorted;
+    const filtered = (filter && normalizeWord(filter) !== "all")
+        ? sorted.filter(comment => normalizeWord(comment.sentimento) === normalizeWord(filter))
+        : sorted;
+
+    const limited = limit ? filtered.slice(0, limit) : filtered;
 
     return limited.map((input) => {
         const { user, conversa, sentimento, data_acao } = input;
 
         const name = user || "Usuário Anônimo";
         const initials = name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase();
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase();
 
         const dateTime = DateTime.fromISO(data_acao, { zone: "utc" }).setZone();
         const now = DateTime.local();
@@ -67,17 +73,18 @@ const treatData = (comments, limit = null) => {
 
 type RecentCommentsProps = {
   limit?: number;
+  filter?: string;
 };
 
-export function RecentComments({ limit }: RecentCommentsProps) {
+export function RecentComments({ limit, filter }: RecentCommentsProps) {
     const [ data, setData ] = useState([])
     const { dados, loading } = useAtendimento()
 
     useEffect(() => {
         if(dados) {
-            setData(treatData(dados, limit))
+            setData(treatData(dados, limit, formatWord(filter)))
         }
-    }, [dados])
+    }, [dados, filter])
 
   const getSentimentIcon = (sentiment: string) => {
     switch (sentiment) {

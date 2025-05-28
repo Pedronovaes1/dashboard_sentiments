@@ -29,8 +29,6 @@ import { SentimentDistribution } from "@/components/sentiment-distribution"
 import { RecentComments } from "@/components/recent-comments"
 import { TopicAnalysis } from "@/components/topic-analysis"
 import { useSentimentosFrequentes } from "@/hooks/useSentimentoFrequente"
-import { useSentimentosRecorrentes } from "@/hooks/useSentimentosRecorrentes"
-
 
 
 const treatFrequente = (data) => {
@@ -47,10 +45,9 @@ const treatFrequente = (data) => {
 export function DashboardPage() {
   const [ limit, setLimit ] = useState(4)
   const [ frequenteData, setFrequenteData ] = useState([])
-  const [ recorrenteData, setRecorrenteData ] = useState([])
+  const [ filter, setFilter ] = useState("all")
 
   const { dados: frequente, loading: loadingFrequente } = useSentimentosFrequentes()
-  const { dados: recorrente, loading: loadingRecorrente } = useSentimentosRecorrentes()
 
   const [isRefreshing, setIsRefreshing] = useState(false)
   const handleRefresh = () => {
@@ -61,8 +58,11 @@ export function DashboardPage() {
 
   useEffect(() => {
       setFrequenteData(treatFrequente([frequente]))
-      setRecorrenteData(recorrente)
-  }, [frequente, recorrente, isRefreshing])
+  }, [frequente, isRefreshing])
+
+  const handleFilter = (value: string) => {
+    setFilter(value);
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -197,7 +197,7 @@ export function DashboardPage() {
                       <CardTitle>Comentários Recentes</CardTitle>
                       <CardDescription>Últimos comentários e suas classificações de sentimento</CardDescription>
                     </div>
-                    <Select defaultValue="all">
+                    <Select defaultValue="all" onValueChange={handleFilter}>
                       <SelectTrigger className="w-[140px]">
                         <SelectValue placeholder="Filtrar por" />
                       </SelectTrigger>
@@ -213,16 +213,33 @@ export function DashboardPage() {
                     </Select>
                   </CardHeader>
                   <CardContent>
-                    <RecentComments limit={limit} />
+                    <RecentComments limit={limit} filter={filter}/>
                   </CardContent>
                   <CardFooter className="flex justify-center border-t px-6 py-4">
-                    <Button variant="outline" onClick={() => setLimit(null)}>Ver Todos</Button>
+                    {limit == null ? (
+                        <Button variant="outline" onClick={() => setLimit(4)}>Ver Menos</Button>
+                    ) :
+                    (
+                      <Button variant="outline" onClick={() => setLimit(null)}>Ver Todos</Button>
+                    )}
                   </CardFooter>
                 </Card>
                 <Card className="lg:col-span-3">
-                  <CardHeader>
-                    <CardTitle>Análise de Tópicos</CardTitle>
-                    <CardDescription>Principais tópicos mencionados nos comentários</CardDescription>
+                  <CardHeader className="flex flex-row items-center">
+                    <div className="flex-1">
+                      <CardTitle>Análise de Tópicos</CardTitle>
+                      <CardDescription>Principais tópicos mencionados nos comentários</CardDescription>
+                    </div>
+                    <Select defaultValue="all">
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Todos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="cliente">Cliente</SelectItem>
+                        <SelectItem value="atendente">Atendente</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </CardHeader>
                   <CardContent>
                     <TopicAnalysis />
