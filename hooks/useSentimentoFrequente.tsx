@@ -8,13 +8,18 @@ export function normalizeWord(word: string): string {
         .replace(/['"]/g, '');
 }
 
-export const sentimentosMap: Record<string, string> = {
-    "satisfacao": "Satisfação",
-    "raiva": "Raiva",
-    "frustracao": "Frustração",
-    "confusao": "Confusão",
-    "urgencia": "Urgência",
-};
+export function formatWord(word: string): string {
+    const sentimentosMap: Record<string, string> = {
+        "satisfacao": "Satisfação",
+        "raiva": "Raiva",
+        "frustracao": "Frustração",
+        "confusao": "Confusão",
+        "urgencia": "Urgência",
+        "neutro": "Neutro"
+    };
+
+    return sentimentosMap[word] ?? word
+}
 
 const sentimentoPositivo = ["satisfacao"];
 const sentimentoNegativo = ["raiva", "frustracao", "confusao", "urgencia"];
@@ -37,9 +42,7 @@ export function useSentimentosFrequentes() {
                     ? "Negativo"
                     : "Neutro";
 
-                const sentimento_formatado =
-                    sentimentosMap[sentimento_normalizado] ??
-                    json.sentimento_predominante;
+                const sentimento_formatado = formatWord(sentimento_normalizado)
 
                 setDados({ ...json, sentimento_predominante: sentimento_formatado, classe });
                 setLoading(false);

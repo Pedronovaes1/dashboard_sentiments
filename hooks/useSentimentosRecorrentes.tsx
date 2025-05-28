@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { normalizeWord, sentimentosMap } from "./useSentimentoFrequente";
+import { formatWord, normalizeWord, sentimentosMap } from "./useSentimentoFrequente";
 
 const sentimentoPositivo = ["satisfacao"];
 const sentimentoNegativo = ["raiva", "frustracao", "confusao", "urgencia"];
@@ -17,7 +17,7 @@ export function useSentimentosRecorrentes() {
                 const tratados = json.map((item) => {
                     const sentimento_normalizado = normalizeWord(item.sentimento);
 
-                    const sentimento_formatado = sentimentosMap[sentimento_normalizado] ?? capitalize(item.sentimento);
+                    const sentimento_formatado = formatWord(sentimento_normalizado) ?? capitalize(item.sentimento);
 
                     const classe = sentimentoPositivo.includes(sentimento_normalizado)
                         ? "Positivo"
