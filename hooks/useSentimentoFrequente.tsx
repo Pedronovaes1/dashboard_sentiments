@@ -5,7 +5,7 @@ export function normalizeWord(word: string): string {
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .replace(/['"]/g, '');
+        .replace(/['",.]/g, '')
 }
 
 export function formatWord(word: string): string {

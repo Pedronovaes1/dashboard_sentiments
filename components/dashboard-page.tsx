@@ -28,7 +28,9 @@ import { SentimentChart } from "@/components/sentiment-chart"
 import { SentimentDistribution } from "@/components/sentiment-distribution"
 import { RecentComments } from "@/components/recent-comments"
 import { TopicAnalysis } from "@/components/topic-analysis"
-import { useSentimentosFrequentes } from "@/hooks/useSentimentoFrequente"
+import { formatWord, useSentimentosFrequentes } from "@/hooks/useSentimentoFrequente"
+import { useAtendimento } from "@/hooks/useAtendimento"
+import { useMaisNegativo } from "@/hooks/useMaisNegativo"
 
 
 const treatFrequente = (data) => {
@@ -45,9 +47,13 @@ const treatFrequente = (data) => {
 export function DashboardPage() {
   const [ limit, setLimit ] = useState(4)
   const [ frequenteData, setFrequenteData ] = useState([])
+  const [ atendimentosData, setAtendimentosData ] = useState([])
+  const [ maisNegativoData, setMaisNegativoData ] = useState([])
   const [ filter, setFilter ] = useState("all")
 
   const { dados: frequente, loading: loadingFrequente } = useSentimentosFrequentes()
+  const { dados: atendimentos, loading: loadingAtendimentos } = useAtendimento()
+  const { dados: mais_negativo, loading: loadingMaisNegativo } = useMaisNegativo()
 
   const [isRefreshing, setIsRefreshing] = useState(false)
   const handleRefresh = () => {
@@ -58,7 +64,9 @@ export function DashboardPage() {
 
   useEffect(() => {
       setFrequenteData(treatFrequente([frequente]))
-  }, [frequente, isRefreshing])
+      setAtendimentosData(atendimentos)
+      setMaisNegativoData(mais_negativo)
+  }, [frequente, atendimentos, mais_negativo, isRefreshing])
 
   const handleFilter = (value: string) => {
     setFilter(value);
@@ -128,9 +136,9 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-7">
             {frequenteData && frequenteData.map((e: any) => (
-              <Card key={e.id}>
+              <Card key={e.id} className="lg:col-span-4">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Sentimento Predominante</CardTitle>
                   {e.classe != "Negativo" ? (
@@ -148,17 +156,18 @@ export function DashboardPage() {
                   </CardContent>
               </Card>
             ))}
-            <Card>
+            <Card className="lg:col-span-3">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Sentimentos Negativos</CardTitle>
                 <ThumbsDown className="h-4 w-4 text-red-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12%</div>
-                <div className="flex items-center text-xs text-green-500">
-                  <TrendingDown className="mr-1 h-3 w-3" />
-                  -3.1% em relação ao mês anterior
-                </div>
+              {maisNegativoData && (
+                <>
+                  <div className="text-2xl font-bold"> {maisNegativoData.porcentagem} %</div>
+                  <div className="text-2xl text-red-600"> {formatWord(maisNegativoData.sentimento)}</div>
+                </>
+              )}
               </CardContent>
             </Card>
           </div>
@@ -213,7 +222,11 @@ export function DashboardPage() {
                     </Select>
                   </CardHeader>
                   <CardContent>
-                    <RecentComments limit={limit} filter={filter}/>
+                    <RecentComments
+                        limit={limit}
+                        filter={filter}
+                        data={atendimentosData}
+                        />
                   </CardContent>
                   <CardFooter className="flex justify-center border-t px-6 py-4">
                     {limit == null ? (

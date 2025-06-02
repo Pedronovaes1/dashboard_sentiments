@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { formatWord, normalizeWord, sentimentosMap } from "./useSentimentoFrequente";
+import { formatWord, normalizeWord } from "./useSentimentoFrequente";
 
 const sentimentoPositivo = ["satisfacao"];
 const sentimentoNegativo = ["raiva", "frustracao", "confusao", "urgencia"];

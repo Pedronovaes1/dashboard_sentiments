@@ -74,17 +74,17 @@ const treatData = (comments, limit = null, filter = null) => {
 type RecentCommentsProps = {
   limit?: number;
   filter?: string;
+  data: any;
 };
 
-export function RecentComments({ limit, filter }: RecentCommentsProps) {
-    const [ data, setData ] = useState([])
-    const { dados, loading } = useAtendimento()
+export function RecentComments({ limit, filter, data }: RecentCommentsProps) {
+    const [ localData, setLocalData ] = useState([])
 
     useEffect(() => {
-        if(dados) {
-            setData(treatData(dados, limit, formatWord(filter)))
+        if(data) {
+            setLocalData(treatData(data, limit, formatWord(filter)))
         }
-    }, [dados, filter])
+    }, [data, filter])
 
   const getSentimentIcon = (sentiment: string) => {
     switch (sentiment) {
@@ -122,7 +122,7 @@ export function RecentComments({ limit, filter }: RecentCommentsProps) {
 
   return (
     <div className="space-y-4">
-      {data && data.map((comment: Comment, index) => (
+      {localData && localData.map((comment: Comment, index) => (
         <div key={comment.id}>
           <div className="flex items-start gap-4">
           <Avatar className="h-10 w-10 border">
