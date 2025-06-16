@@ -30,6 +30,9 @@ Este projeto é um dashboard interativo para análise de sentimentos de clientes
    ```
 
 2. **Instale as depdências**
+   ```sh
+   npm install
+   ```
 3. **Configure as variáveis de ambiente**: Crie um arquivo .env na raiz do projeto com o conteúdo NEXT_PUBLIC_API_URL=http://localhost:8000
 4. **Inicie o projeto**:
    ```sh
